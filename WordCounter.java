@@ -15,7 +15,7 @@ public class WordCounter{
 	}
 	
 	public void parseFile(File file) throws IOException{
-		//System.out.println("Starting parsing the file:" + file.getAbsolutePath());
+		//System.out.println("Starting parsing the file:" + file.getAbsolutePcmdath());
 		HashSet<String> existingWords = new HashSet<String>();
 		if(file.isDirectory()){
 			//parse each file inside the directory
@@ -101,7 +101,6 @@ public class WordCounter{
 		File outFile = new File(fileName2);
 
 		WordCounter wordCounter = new WordCounter();
-		System.out.println("Hello");
 		try{
 			wordCounter.parseFile(dataDir);
 			wordCounter.outputWordCount(1, outFile);
@@ -117,7 +116,7 @@ public class WordCounter{
 		File dataDir = new File(fileName1);
 
 		WordCounter wordCounter = new WordCounter();
-		System.out.println("Hello");
+		//System.out.println("Hello");
 		try{
 			wordCounter.parseFile(dataDir);
 
