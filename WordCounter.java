@@ -180,10 +180,8 @@ public class WordCounter{
 		}
 	}
 
-	public double fileIsSpamProbability(){
+	public double fileIsSpamProbability(File file)throws IOException{
 		double n = 0;
-		File file = new File("./data/test/spam");
-		Scanner scanner = new Scanner("./data/test/spam");
 		if(file.isDirectory()) {
 			//parse each file inside the directory
 			File[] content = file.listFiles();
@@ -192,15 +190,18 @@ public class WordCounter{
 			}
 		}
 		else{
+			Scanner scanner = new Scanner(file);
 			while (scanner.hasNext()) {
 				String spamWord = scanner.next();
 				if (isValidWord(spamWord) && wordInBoth.containsKey(spamWord)) {
 					n += (Math.log(1.0 - wordInBoth.get(spamWord)) - Math.log(wordInBoth.get(spamWord)));
+
 				}
 			}
 		}
-
+		System.out.println(n);
 		double fileIsSpam = 1/(1 + Math.pow(Math.E,n));
+		//System.out.println(fileIsSpam);
 		return fileIsSpam;
 
 	}
@@ -210,6 +211,7 @@ public class WordCounter{
 		WordCounter trainHamFreq = new WordCounter();
 		WordCounter trainSpamFreq = new WordCounter();
 		WordCounter trainFinal = new WordCounter();
+		WordCounter test = new WordCounter();
 
 		fileOut("./data/train/ham", "hamCount.txt");
 		fileOut("./data/train/ham2", "ham2Count.txt");
@@ -234,9 +236,17 @@ public class WordCounter{
 		//Word is in both ham and spam and probability P(S|W)
 		trainFinal.findWordBoth();
 
-		System.out.println(trainFinal.fileIsSpamProbability());
+		//System.out.println(trainFinal.fileIsSpamProbability(current));
 		//Finding Probability that file is spam
+		test = trainFinal;
+		File dataDir = new File("./data/test/spam");
+		try {
+			test.fileIsSpamProbability(dataDir);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 
+		//fileIsSpamProbability("./data/test/ham");
 		// Test phase
 
 //		// Create the object for the test phase
