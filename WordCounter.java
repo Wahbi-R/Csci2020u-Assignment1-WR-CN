@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -237,11 +238,10 @@ public class WordCounter extends Application{
 
 	}
 
-	public ObservableList<TestFile> getTestFiles(WordCounter testWords) throws IOException {
+	public ObservableList<TestFile> getTestFiles(WordCounter testWords, File dataDir) throws IOException {
 		ObservableList<TestFile> testFileList = FXCollections.observableArrayList();
 		double tempNum = 0.0;
 		DecimalFormat df = new DecimalFormat("0.00000");
-		File dataDir = new File("./data/test/ham");
 		if(dataDir.isDirectory()) {
 			//parse each file inside the directory
 			File[] content = dataDir.listFiles();
@@ -290,6 +290,9 @@ public class WordCounter extends Application{
 
 		//TEST PHASE
 		//Finding Probability that file is spam
+		DirectoryChooser directoryChooser = new DirectoryChooser();
+		directoryChooser.setInitialDirectory(new File("."));
+		File mainDirectory = directoryChooser.showDialog(primaryStage);
 		test = trainFinal;
 		primaryStage.setTitle("Assignment 1");
 
@@ -308,7 +311,7 @@ public class WordCounter extends Application{
 		spamProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("spamProbability"));
 		//Table Setup
 		table = new TableView<>();
-		table.setItems(getTestFiles(test));
+		table.setItems(getTestFiles(test, mainDirectory));
 		table.getColumns().addAll(fileColumn, actualClassColumn, spamProbabilityColumn);
 
 		VBox vBox = new VBox();
