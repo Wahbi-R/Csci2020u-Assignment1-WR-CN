@@ -15,7 +15,7 @@ public class WordCounter{
 	}
 	
 	public void parseFile(File file) throws IOException{
-		System.out.println("Starting parsing the file:" + file.getAbsolutePath());
+		//System.out.println("Starting parsing the file:" + file.getAbsolutePath());
 		HashSet<String> existingWords = new HashSet<String>();
 		if(file.isDirectory()){
 			//parse each file inside the directory
@@ -95,18 +95,11 @@ public class WordCounter{
 		}
 		
 	}
-	
-	//main method
-	public static void main(String[] args) {
-		
-		if(args.length < 2){
-			System.err.println("Usage: java WordCounter <inputDir> <outfile>");
-			System.exit(0);
-		}
-		
-		File dataDir = new File(args[0]);
-		File outFile = new File(args[1]);		
-		
+
+	public static void fileOut(String fileName1, String fileName2){
+		File dataDir = new File(fileName1);
+		File outFile = new File(fileName2);
+
 		WordCounter wordCounter = new WordCounter();
 		System.out.println("Hello");
 		try{
@@ -118,7 +111,44 @@ public class WordCounter{
 		}catch(IOException e){
 			e.printStackTrace();
 		}
-		
+	}
+
+	public static void hashOut(String fileName1, String fileName2){
+		File dataDir = new File(fileName1);
+		File outFile = new File(fileName2);
+
+		WordCounter wordCounter = new WordCounter();
+		System.out.println("Hello");
+		try{
+			wordCounter.parseFile(dataDir);
+			wordCounter.wordCounts.get();
+		}catch(FileNotFoundException e){
+			System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
+			e.printStackTrace();
+		}catch(IOException e){
+			e.printStackTrace();
+		}
+	}
+
+	public void set(){
+
+	}
+	//main method
+	public static void main(String[] args) {
+		WordCounter trainHamFreq = new WordCounter();
+		WordCounter trainSpamFreq = new WordCounter();
+		//if(args.length < 2){
+		//	System.err.println("Usage: java WordCounter <inputDir> <outfile>");
+		//	System.exit(0);
+		//}
+		//trainHamFreq
+		fileOut("./data/train/ham", "hamCount.txt");
+		fileOut("./data/train/ham2", "ham2Count.txt");
+		fileOut("./data/train/spam", "spam2Count.txt");
+		trainHamFreq.set(hashout("./data/train/ham"));
+		trainSpamFreq = hashout("./data/train/spam");
+
+
 		
 	}
 	

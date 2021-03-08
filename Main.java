@@ -1,5 +1,5 @@
 public class Main {
-    private static void trainHamFreq(){
+    private static void trainHamFreq(String file1, String fileOutput){
         String[] run = new String[2];
         run[0] = file1;
         run[1] = fileOutput;
@@ -15,7 +15,7 @@ public class Main {
 
 
     public static void main(String[] args) {
-        //trainHamFreq("./data/train/spam", "spamCount.txt");
+        trainHamFreq("./data/train/spam", "spamCount.txt");
 
         //trainSpamFreq("spam", "spamCount.txt");
     }
