@@ -4,12 +4,13 @@ import java.util.*;
 
 public class WordCounter{
 	
-	private static Map<String, Integer> wordCounts;
-	private Map<String, Integer> trainHamFreq;
-	private Map<String, Integer> trainSpamFreq;
+	private static Map<String, Double> wordCounts;
+	private Map<String, Double> trainHamFreq;
+	private Map<String, Double> trainSpamFreq;
 	private Map<String, Double> fileIsSpam;
 	private Map<String, Double> wordInSpam;
 	private Map<String, Double> wordInHam;
+	private Map<String, Double> wordInBoth;
 	
 	public WordCounter(){
 		wordCounts = new TreeMap<>();
@@ -17,7 +18,7 @@ public class WordCounter{
 		trainSpamFreq = new TreeMap<>();
 		fileIsSpam = new TreeMap<>();
 		wordInSpam = new TreeMap<>();
-		wordInHam = new TreeMap<>()
+		wordInHam = new TreeMap<>();
 	}
 	
 	public void parseFile(File file) throws IOException{
@@ -46,11 +47,11 @@ public class WordCounter{
 			
 			for(int i=0;i< words.size();i++){
 				if(isValidWord(words.get(i)) && wordCounts.containsKey(words.get(i))){
-					int previous = wordCounts.get(words.get(i));
-					wordCounts.put(words.get(i), previous+1);
+					double previous = wordCounts.get(words.get(i));
+					wordCounts.put(words.get(i), previous+1.0);
 				}
 				else{
-					wordCounts.put(words.get(i),1);
+					wordCounts.put(words.get(i),1.0);
 				}
 			}	
 		}		
@@ -66,10 +67,10 @@ public class WordCounter{
 	
 	private void countWord(String word){
 		if(wordCounts.containsKey(word)){
-			int previous = wordCounts.get(word);
+			double previous = wordCounts.get(word);
 			wordCounts.put(word, previous+1);
 		}else{
-			wordCounts.put(word, 1);
+			wordCounts.put(word, 1.0);
 		}
 	}
 	
@@ -87,7 +88,7 @@ public class WordCounter{
 				
 				while(keyIterator.hasNext()){
 					String key = keyIterator.next();
-					int count = wordCounts.get(key);
+					double count = wordCounts.get(key);
 					// testing minimum number of occurances
 					if(count>=minCount){					
 						fileOutput.println(key + ": " + count);
@@ -143,26 +144,61 @@ public class WordCounter{
 		trainSpamFreq = hashOut("./data/train/spam");
 	}
 
-//	public void printTrainHamFreq(){
-//		for(String i : trainHamFreq.keySet()){
-//			System.out.println("Key" + i + " " + trainHamFreq.get(i));
-//		}
-//	}
+	public void printTrainHamFreq(){
+		for(String i : wordInHam.keySet()){
+			System.out.println("Key" + i + " " + wordInHam.get(i));
+		}
+	}
+
+	public void putTrainHamFreq(){
+		for(String i : trainHamFreq.keySet()){
+			wordInHam.put(i, trainHamFreq.get(i)/trainHamFreq.keySet().size());
+		}
+	}
+
+	public void putTrainSpamFreq(){
+		for(String i : trainSpamFreq.keySet()){
+			wordInSpam.put(i, trainSpamFreq.get(i)/trainSpamFreq.keySet().size());
+		}
+	}
+
+	public void findWordBoth(){
+		for(String i : trainSpamFreq.keySet()){
+			for(String n : trainHamFreq.keySet()){
+				if(i == n) { wordInBoth.put(i, wordInSpam.get(i)/wordInSpam.get(i)+wordInHam.get(i)); }
+			}
+		}
+	}
+
+	public void findSpamProbability(){
+
+	}
+
 	//main method
 	public static void main(String[] args) {
 		WordCounter trainHamFreq = new WordCounter();
 		WordCounter trainSpamFreq = new WordCounter();
-		//if(args.length < 2){
-		//	System.err.println("Usage: java WordCounter <inputDir> <outfile>");
-		//	System.exit(0);
-		//}
-		//trainHamFreq
+
 		fileOut("./data/train/ham", "hamCount.txt");
 		fileOut("./data/train/ham2", "ham2Count.txt");
 		fileOut("./data/train/spam", "spam2Count.txt");
 		trainHamFreq.setHamFreq();
 		trainSpamFreq.setSpamFreq();
-		//trainHamFreq.printTrainHamFreq();
+		//Putting Probability of words in trainHamFreq
+		trainHamFreq.putTrainHamFreq();
+		trainHamFreq.printTrainHamFreq();
+
+		//Putting Probability of words in trainSpamFreq
+		trainSpamFreq.putTrainSpamFreq();
+
+
+		//Word is in both ham and spam
+		//trainSpamFreq.findWorthBoth();
+
+		//Finding Probability that file is spam
+
+
+
 //test
 
 		
