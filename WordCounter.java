@@ -19,6 +19,7 @@ public class WordCounter{
 		fileIsSpam = new TreeMap<>();
 		wordInSpam = new TreeMap<>();
 		wordInHam = new TreeMap<>();
+		wordInBoth = new TreeMap<>();
 	}
 	
 	public void parseFile(File file) throws IOException{
@@ -150,6 +151,13 @@ public class WordCounter{
 		}
 	}
 
+	public void printTrainSpamFreq(){
+		for(String i : wordInSpam.keySet()){
+			System.out.println("Key" + i + " " + wordInSpam.get(i));
+		}
+	}
+
+
 	public void putTrainHamFreq(){
 		for(String i : trainHamFreq.keySet()){
 			wordInHam.put(i, trainHamFreq.get(i)/trainHamFreq.keySet().size());
@@ -165,7 +173,9 @@ public class WordCounter{
 	public void findWordBoth(){
 		for(String i : trainSpamFreq.keySet()){
 			for(String n : trainHamFreq.keySet()){
-				if(i == n) { wordInBoth.put(i, wordInSpam.get(i)/wordInSpam.get(i)+wordInHam.get(i)); }
+				if(i == n && wordInHam.get(i) != null) {
+					wordInBoth.put(i, wordInSpam.get(i)/(wordInSpam.get(i)+wordInHam.get(i)));
+				}
 			}
 		}
 	}
@@ -178,24 +188,33 @@ public class WordCounter{
 	public static void main(String[] args) {
 		WordCounter trainHamFreq = new WordCounter();
 		WordCounter trainSpamFreq = new WordCounter();
+		WordCounter trainFinal = new WordCounter();
 
 		fileOut("./data/train/ham", "hamCount.txt");
 		fileOut("./data/train/ham2", "ham2Count.txt");
 		fileOut("./data/train/spam", "spam2Count.txt");
 		trainHamFreq.setHamFreq();
 		trainSpamFreq.setSpamFreq();
-		//Putting Probability of words in trainHamFreq
+		//Putting Probability of words in trainHamFreq P(W|H)
 		trainHamFreq.putTrainHamFreq();
-		trainHamFreq.printTrainHamFreq();
+		//trainHamFreq.printTrainHamFreq();
 
-		//Putting Probability of words in trainSpamFreq
+		//Putting Probability of words in trainSpamFreq P(W|S)
 		trainSpamFreq.putTrainSpamFreq();
 
+		//Set every value so far
+		trainFinal.wordInHam = trainHamFreq.wordInHam;
+		trainFinal.wordInSpam = trainSpamFreq.wordInSpam;
+		trainFinal.trainSpamFreq = trainSpamFreq.trainSpamFreq;
+		trainFinal.trainHamFreq = trainSpamFreq.trainSpamFreq;
 
-		//Word is in both ham and spam
-		//trainSpamFreq.findWorthBoth();
+		//trainFinal.printTrainSpamFreq();
+
+		//Word is in both ham and spam and probability P(S|W)
+		trainFinal.findWordBoth();
 
 		//Finding Probability that file is spam
+
 
 
 
