@@ -337,7 +337,7 @@ public class WordCounter extends Application{
 
 		// calculate accuracy and precision
 		test.accuracy = (test.numTruePostives + test.numTrueNegatives)/test.numTestFiles;
-		test.precision = test.numTruePostives/ (test.numFalsePositives + test.numTrueNegatives);
+		test.precision = test.numTruePostives/ (test.numFalsePositives + test.numTruePostives);
 		System.out.println(accuracy);
 		System.out.println(precision);
 
