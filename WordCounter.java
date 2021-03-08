@@ -49,7 +49,14 @@ public class WordCounter extends Application{
 	private Map<String, Double> wordInSpam;
 	private Map<String, Double> wordInHam;
 	private Map<String, Double> wordInBoth;
-	
+
+	double numTruePostives = 0;
+	double numFalsePositives = 0;
+	double numTrueNegatives = 0;
+	double accuracy ;
+	double precision ;
+	double numTestFiles;
+
 	public WordCounter(){
 		wordCounts = new TreeMap<>();
 		trainHamFreq = new TreeMap<>();
@@ -220,6 +227,7 @@ public class WordCounter extends Application{
 
 	public double fileIsSpamProbability(File file)throws IOException{
 		double n = 0;
+		double threshold = 0.5;
 			Scanner scanner = new Scanner(file);
 			while (scanner.hasNext()) {
 				String spamWord = scanner.next();
@@ -231,9 +239,20 @@ public class WordCounter extends Application{
 
 		System.out.println(n);
 		double fileIsSpam = 1/(1 + Math.pow(Math.E,n));
+		if (file.getParent().contains("spam") && fileIsSpam > threshold){
+			numTruePostives += 1;
+		}
+		if (file.getParent().contains("ham") && fileIsSpam > threshold){
+			numFalsePositives += 1;
+		}
+		if (file.getParent().contains("ham") && fileIsSpam < threshold){
+			numTrueNegatives += 1;
+		}
+		numTestFiles += 1;
 		//System.out.println(fileIsSpam);
 		DecimalFormat df = new DecimalFormat("0.00000");
 		df.format(fileIsSpam);
+
 		return fileIsSpam;
 
 	}
@@ -296,6 +315,11 @@ public class WordCounter extends Application{
 		test = trainFinal;
 		primaryStage.setTitle("Assignment 1");
 
+		// calculate accuracy and precision
+		accuracy = (numTruePostives + numTrueNegatives)/numTestFiles;
+		precision = numTruePostives/ (numFalsePositives + numTrueNegatives);
+
+
 		TableView<TestFile> table;
 		//Name Columns
 		TableColumn<TestFile, String> fileColumn = new TableColumn<>("File");
@@ -325,7 +349,9 @@ public class WordCounter extends Application{
 		Label accuracyLabel = new Label("Accuracy: ");
 		GridPane.setConstraints(accuracyLabel, 0, 4);
 		//Accuracy input
-		TextField accuracyInput = new TextField("3");
+		DecimalFormat df = new DecimalFormat("0.00000");
+		TextField accuracyInput = new TextField();
+		
 		accuracyInput.setPrefSize(100, 20);
 		accuracyInput.setMaxSize(100,20);
 		GridPane.setConstraints(accuracyInput, 0, 5);
@@ -334,7 +360,7 @@ public class WordCounter extends Application{
 		Label precisionLabel = new Label("Precision: ");
 		GridPane.setConstraints(precisionLabel, 0, 6);
 		//Accuracy input
-		TextField precisionInput = new TextField("3");
+		TextField precisionInput = new TextField(df.format(precision));
 		precisionInput.setPrefSize(100, 20);
 		precisionInput.setMaxSize(100,20);
 		GridPane.setConstraints(precisionInput, 0, 7);
