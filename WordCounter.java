@@ -180,7 +180,17 @@ public class WordCounter{
 		}
 	}
 
-	public void findSpamProbability(){
+	public double fileIsSpamProbability(){
+		double n = 0;
+		for(String i: wordInBoth.keySet()){
+			double sum = (Math.log(1.0 - wordInBoth.get(i))-Math.log(wordInBoth.get(i)));
+			n = n + sum;
+		}
+//		for(int k = 1; k < wordInBoth.keySet().size();k++){
+//			n += (Math.log(1- wordInBoth.get(i))-Math.log(wordInBoth.get(i)));
+//		}
+		double fileIsSpam = n;
+		return fileIsSpam;
 
 	}
 
@@ -213,13 +223,18 @@ public class WordCounter{
 		//Word is in both ham and spam and probability P(S|W)
 		trainFinal.findWordBoth();
 
+		System.out.println(trainFinal.fileIsSpamProbability());
 		//Finding Probability that file is spam
 
+		// Test phase
 
-
-
-//test
-
+//		// Create the object for the test phase
+//		WordCounter testHamFreq = new WordCounter();
+//		WordCounter testSpamFreq = new WordCounter();
+//		WordCounter testFinal = new WordCounter();
+//
+//		fileOut("./data/test/ham", "hamCount.txt");
+//		fileOut("./data/test/spam", "spamCount.txt");
 		
 	}
 	
