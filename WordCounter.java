@@ -50,12 +50,12 @@ public class WordCounter extends Application{
 	private Map<String, Double> wordInHam;
 	private Map<String, Double> wordInBoth;
 
-	double numTruePostives = 0;
-	double numFalsePositives = 0;
-	double numTrueNegatives = 0;
-	double accuracy ;
-	double precision ;
-	double numTestFiles;
+	public double numTruePostives = 0;
+	public double numFalsePositives = 0;
+	public double numTrueNegatives = 0;
+	public double accuracy ;
+	public double precision ;
+	public double numTestFiles;
 
 	public WordCounter(){
 		wordCounts = new TreeMap<>();
@@ -237,7 +237,7 @@ public class WordCounter extends Application{
 				}
 			}
 
-		System.out.println(n);
+		//System.out.println(n);
 		double fileIsSpam = 1/(1 + Math.pow(Math.E,n));
 		if (file.getParent().contains("spam") && fileIsSpam > threshold){
 			numTruePostives += 1;
@@ -265,6 +265,7 @@ public class WordCounter extends Application{
 			//parse each file inside the directory
 			File[] content = dataDir.listFiles();
 			for (File current : content) {
+				testWords.fileIsSpamProbability(current);
 				tempNum = testWords.fileIsSpamProbability(current);
 				testFileList.add(new TestFile(current.getName(), tempNum, dataDir.getName()));
 			}
@@ -315,10 +316,6 @@ public class WordCounter extends Application{
 		test = trainFinal;
 		primaryStage.setTitle("Assignment 1");
 
-		// calculate accuracy and precision
-		accuracy = (numTruePostives + numTrueNegatives)/numTestFiles;
-		precision = numTruePostives/ (numFalsePositives + numTrueNegatives);
-
 
 		TableView<TestFile> table;
 		//Name Columns
@@ -338,6 +335,12 @@ public class WordCounter extends Application{
 		table.setItems(getTestFiles(test, mainDirectory));
 		table.getColumns().addAll(fileColumn, actualClassColumn, spamProbabilityColumn);
 
+		// calculate accuracy and precision
+		test.accuracy = (test.numTruePostives + test.numTrueNegatives)/test.numTestFiles;
+		test.precision = test.numTruePostives/ (test.numFalsePositives + test.numTrueNegatives);
+		System.out.println(accuracy);
+		System.out.println(precision);
+
 		VBox vBox = new VBox();
 		vBox.getChildren().addAll(table);
 		GridPane grid = new GridPane();
@@ -350,7 +353,7 @@ public class WordCounter extends Application{
 		GridPane.setConstraints(accuracyLabel, 0, 4);
 		//Accuracy input
 		DecimalFormat df = new DecimalFormat("0.00000");
-		TextField accuracyInput = new TextField();
+		TextField accuracyInput = new TextField(String.valueOf(df.format(test.accuracy)));
 		
 		accuracyInput.setPrefSize(100, 20);
 		accuracyInput.setMaxSize(100,20);
@@ -360,7 +363,7 @@ public class WordCounter extends Application{
 		Label precisionLabel = new Label("Precision: ");
 		GridPane.setConstraints(precisionLabel, 0, 6);
 		//Accuracy input
-		TextField precisionInput = new TextField(df.format(precision));
+		TextField precisionInput = new TextField(String.valueOf(df.format(test.precision)));
 		precisionInput.setPrefSize(100, 20);
 		precisionInput.setMaxSize(100,20);
 		GridPane.setConstraints(precisionInput, 0, 7);
@@ -369,6 +372,7 @@ public class WordCounter extends Application{
 		grid.setAlignment(Pos.BOTTOM_LEFT);
 		grid.add(vBox, 0,1);
 		Scene scene = new Scene(grid);
+		scene.getStylesheets().add("Colors.css");
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}

@@ -1,0 +1,11 @@
+.root{
+  -fx-background-color: honeydew;
+}
+
+.label{
+  -fx-font-weight: bold;
+}
+.text-field{
+  -fx-background-color: powderblue;
+  -fx-background-radius: 4;
+}
