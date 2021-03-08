@@ -1,4 +1,0 @@
-apple: 3
-orange: 2
-pineapple: 1
-watermelon: 1

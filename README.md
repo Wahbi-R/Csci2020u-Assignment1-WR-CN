@@ -30,6 +30,7 @@ Your program should be able to run now.
 Step 13: Under Run, choose run, then run Main
 Step 14: When the directory chooser interface shows up, choose the folder you want to calculate the spam probability then select OK
 
+An illustration of the expected output:
 
 References:
 https://www.youtube.com/watch?v=FLkOX4Eez6o&list=PL6gx4Cwl9DGBzfXLWLSYVy8EbTdpGbUIG (Overall JavaFX Guides)

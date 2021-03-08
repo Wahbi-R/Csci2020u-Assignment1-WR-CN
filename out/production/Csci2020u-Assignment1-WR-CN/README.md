@@ -5,7 +5,7 @@ Group Members: Wahbi Raihan (100751913) & Chau Nguyen (100747411)
 This is a Spam Detector that checks a file or a directory/folder and searches 
 through every file in a folder called Ham and Spam and makes a list of the occurences.
 It then compares the two lists and finds common words and tells you whether a selected folder
-has spam or not.
+has spam or not. (The reason we don't round our probabilities here is due to the fact that all our probabilities would end up as zero, the function still exists and can be used easily)
 
 The interface has been improved so that now the Accuracy and Precision is bold, colours have been added
 as well to the background, textboxes and text making it look much more aesthetically pleasing.
