@@ -182,14 +182,25 @@ public class WordCounter{
 
 	public double fileIsSpamProbability(){
 		double n = 0;
-		for(String i: wordInBoth.keySet()){
-			double sum = (Math.log(1.0 - wordInBoth.get(i))-Math.log(wordInBoth.get(i)));
-			n = n + sum;
+		File file = new File("./data/test/spam");
+		Scanner scanner = new Scanner("./data/test/spam");
+		if(file.isDirectory()) {
+			//parse each file inside the directory
+			File[] content = file.listFiles();
+			for (File current : content) {
+				fileIsSpamProbability(current);
+			}
 		}
-//		for(int k = 1; k < wordInBoth.keySet().size();k++){
-//			n += (Math.log(1- wordInBoth.get(i))-Math.log(wordInBoth.get(i)));
-//		}
-		double fileIsSpam = n;
+		else{
+			while (scanner.hasNext()) {
+				String spamWord = scanner.next();
+				if (isValidWord(spamWord) && wordInBoth.containsKey(spamWord)) {
+					n += (Math.log(1.0 - wordInBoth.get(spamWord)) - Math.log(wordInBoth.get(spamWord)));
+				}
+			}
+		}
+
+		double fileIsSpam = 1/(1 + Math.pow(Math.E,n));
 		return fileIsSpam;
 
 	}
