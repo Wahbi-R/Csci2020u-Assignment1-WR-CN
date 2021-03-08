@@ -1,9 +1,15 @@
 import java.io.*;
+import java.text.DecimalFormat;
 import java.util.*;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -213,14 +219,6 @@ public class WordCounter extends Application{
 
 	public double fileIsSpamProbability(File file)throws IOException{
 		double n = 0;
-		if(file.isDirectory()) {
-			//parse each file inside the directory
-			File[] content = file.listFiles();
-			for (File current : content) {
-				fileIsSpamProbability(current);
-			}
-		}
-		else{
 			Scanner scanner = new Scanner(file);
 			while (scanner.hasNext()) {
 				String spamWord = scanner.next();
@@ -229,29 +227,36 @@ public class WordCounter extends Application{
 
 				}
 			}
-		}
+
 		System.out.println(n);
 		double fileIsSpam = 1/(1 + Math.pow(Math.E,n));
 		//System.out.println(fileIsSpam);
+		DecimalFormat df = new DecimalFormat("0.00000");
+		df.format(fileIsSpam);
 		return fileIsSpam;
 
 	}
 
-	public ObservableList<TestFile> getTestFiles(WordCounter testWords){
+	public ObservableList<TestFile> getTestFiles(WordCounter testWords) throws IOException {
 		ObservableList<TestFile> testFileList = FXCollections.observableArrayList();
 		double tempNum = 0.0;
-		File dataDir = new File("./data/test/spam");
-		try {
-			tempNum = testWords.fileIsSpamProbability(dataDir);
-		} catch (IOException e) {
-			e.printStackTrace();
+		DecimalFormat df = new DecimalFormat("0.00000");
+		File dataDir = new File("./data/test/ham");
+		if(dataDir.isDirectory()) {
+			//parse each file inside the directory
+			File[] content = dataDir.listFiles();
+			for (File current : content) {
+				tempNum = testWords.fileIsSpamProbability(current);
+				testFileList.add(new TestFile(current.getName(), tempNum, dataDir.getName()));
+			}
+
 		}
-		testFileList.add(new TestFile("Temp_FileName", tempNum, "Ham"));
+//		testFileList.add(new TestFile(current.getName(), tempNum, content.getName()));
 		return testFileList;
 	}
 
 	@Override
-	public void start(Stage primaryStage) throws Exception{
+	public void start(Stage primaryStage) throws IOException {
 		WordCounter trainHamFreq = new WordCounter();
 		WordCounter trainSpamFreq = new WordCounter();
 		WordCounter trainFinal = new WordCounter();
@@ -270,10 +275,10 @@ public class WordCounter extends Application{
 		trainSpamFreq.putTrainSpamFreq();
 
 		//Set every value so far
-		trainFinal.wordInHam = trainHamFreq.wordInHam;
-		trainFinal.wordInSpam = trainSpamFreq.wordInSpam;
 		trainFinal.trainSpamFreq = trainSpamFreq.trainSpamFreq;
 		trainFinal.trainHamFreq = trainSpamFreq.trainSpamFreq;
+		trainFinal.wordInHam = trainHamFreq.wordInHam;
+		trainFinal.wordInSpam = trainSpamFreq.wordInSpam;
 
 		//trainFinal.printTrainSpamFreq();
 
@@ -286,18 +291,6 @@ public class WordCounter extends Application{
 		//TEST PHASE
 		//Finding Probability that file is spam
 		test = trainFinal;
-		File dataDir = new File("./data/test/spam");
-		try {
-			test.fileIsSpamProbability(dataDir);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		//test.initialize();
-
-		//Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-//		primaryStage.setTitle("Lab 05 Solution");
-//		primaryStage.setScene(new Scene(root, 500, 275));
-//		primaryStage.show();
 		primaryStage.setTitle("Assignment 1");
 
 		TableView<TestFile> table;
@@ -313,15 +306,30 @@ public class WordCounter extends Application{
 		TableColumn<TestFile, String> spamProbabilityColumn = new TableColumn<>("Spam Probability");
 		spamProbabilityColumn.setMinWidth(400);
 		spamProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("spamProbability"));
-
+		//Table Setup
 		table = new TableView<>();
 		table.setItems(getTestFiles(test));
 		table.getColumns().addAll(fileColumn, actualClassColumn, spamProbabilityColumn);
 
 		VBox vBox = new VBox();
 		vBox.getChildren().addAll(table);
+		GridPane grid = new GridPane();
+		grid.setPadding(new Insets(0, 0, 0, 0));
+		grid.setVgap(8);
+		grid.setVgap(10);
 
-		Scene scene = new Scene(vBox);
+		//Accuracy Label
+		Label accuracyLabel = new Label("Accuracy: ");
+		GridPane.setConstraints(accuracyLabel, 0, 4);
+
+		//Accuracy input
+		TextField accuracyInput = new TextField("3");
+		GridPane.setConstraints(accuracyInput, 1, 4);
+
+		grid.getChildren().addAll(accuracyLabel, accuracyInput);
+		grid.setAlignment(Pos.BOTTOM_LEFT);
+		grid.add(vBox, 0,1);
+		Scene scene = new Scene(grid);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
