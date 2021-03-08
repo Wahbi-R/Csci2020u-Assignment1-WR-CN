@@ -1,9 +1,40 @@
 import java.io.*;
 import java.util.*;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class WordCounter extends Application{
+	public void initialize(){
+		TableView<TestFile> table;
+		//Name Columns
+		TableColumn<TestFile, String> fileColumn = new TableColumn<>("File");
+		fileColumn.setCellValueFactory(new PropertyValueFactory<>("filename"));
+
+		TableColumn<TestFile, String> actualClassColumn = new TableColumn<>("Actual Class");
+		actualClassColumn.setCellValueFactory(new PropertyValueFactory<>("actualClass"));
+
+		TableColumn<TestFile, String> spamProbabilityColumn = new TableColumn<>("Spam Probability");
+		spamProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("spamProbability"));
+
+		table = new TableView<>();
+		table.setItems(getTestFiles());
+		table.getColumns().addAll(fileColumn, actualClassColumn, spamProbabilityColumn);
+		VBox vBox = new VBox();
+		vBox.getChildren().addAll();
+	}
 
 
-public class WordCounter{
-	
+
 	private static Map<String, Double> wordCounts;
 	private Map<String, Double> trainHamFreq;
 	private Map<String, Double> trainSpamFreq;
@@ -206,8 +237,48 @@ public class WordCounter{
 
 	}
 
+	public ObservableList<TestFile> getTestFiles(){
+		ObservableList<TestFile> testFileList = FXCollections.observableArrayList();
+		testFileList.add(new TestFile("Temp_FileName", 0.00, "Ham"));
+		return testFileList;
+	}
+
+	@Override
+	public void start(Stage primaryStage) throws Exception{
+		//Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+//		primaryStage.setTitle("Lab 05 Solution");
+//		primaryStage.setScene(new Scene(root, 500, 275));
+//		primaryStage.show();
+		primaryStage.setTitle("Assignment 1");
+
+		TableView<TestFile> table;
+		//Name Columns
+		TableColumn<TestFile, String> fileColumn = new TableColumn<>("File");
+		fileColumn.setMinWidth(200);
+		fileColumn.setCellValueFactory(new PropertyValueFactory<>("filename"));
+
+		TableColumn<TestFile, String> actualClassColumn = new TableColumn<>("Actual Class");
+		actualClassColumn.setMinWidth(400);
+		actualClassColumn.setCellValueFactory(new PropertyValueFactory<>("actualClass"));
+
+		TableColumn<TestFile, String> spamProbabilityColumn = new TableColumn<>("Spam Probability");
+		spamProbabilityColumn.setMinWidth(400);
+		spamProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("spamProbability"));
+
+		table = new TableView<>();
+		table.setItems(getTestFiles());
+		table.getColumns().addAll(fileColumn, actualClassColumn, spamProbabilityColumn);
+
+		VBox vBox = new VBox();
+		vBox.getChildren().addAll(table);
+
+		Scene scene = new Scene(vBox);
+		primaryStage.setScene(scene);
+		primaryStage.show();
+	}
+
 	//main method
-	public static void main(String[] args) {
+	public static void main(String[] args){
 		WordCounter trainHamFreq = new WordCounter();
 		WordCounter trainSpamFreq = new WordCounter();
 		WordCounter trainFinal = new WordCounter();
@@ -236,7 +307,10 @@ public class WordCounter{
 		//Word is in both ham and spam and probability P(S|W)
 		trainFinal.findWordBoth();
 
-		//System.out.println(trainFinal.fileIsSpamProbability(current));
+		//Get all of the TestFiles
+
+
+		//TEST PHASE
 		//Finding Probability that file is spam
 		test = trainFinal;
 		File dataDir = new File("./data/test/spam");
@@ -245,7 +319,8 @@ public class WordCounter{
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		//test.initialize();
+		launch(args);
 		//fileIsSpamProbability("./data/test/ham");
 		// Test phase
 
