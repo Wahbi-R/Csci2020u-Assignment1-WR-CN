@@ -4,7 +4,7 @@ import java.util.*;
 
 public class WordCounter{
 	
-	private Map<String, Integer> wordCounts;
+	private static Map<String, Integer> wordCounts;
 	private Map<String, Integer> trainHamFreq;
 	private Map<String, Integer> trainSpamFreq;
 	
@@ -113,26 +113,31 @@ public class WordCounter{
 		}
 	}
 
-	public static void hashOut(String fileName1, String fileName2){
+	public static Map hashOut(String fileName1){
 		File dataDir = new File(fileName1);
-		File outFile = new File(fileName2);
 
 		WordCounter wordCounter = new WordCounter();
 		System.out.println("Hello");
 		try{
 			wordCounter.parseFile(dataDir);
-			wordCounter.wordCounts.get();
+
 		}catch(FileNotFoundException e){
 			System.err.println("Invalid input dir: " + dataDir.getAbsolutePath());
 			e.printStackTrace();
 		}catch(IOException e){
 			e.printStackTrace();
 		}
+		return wordCounter.wordCounts;
 	}
 
-	public void set(){
-
+	public void setHamFreq(){
+		trainHamFreq = hashOut("./data/train/ham");
 	}
+
+	public void setSpamFreq(){
+		trainSpamFreq = hashOut("./data/train/spam");
+	}
+
 	//main method
 	public static void main(String[] args) {
 		WordCounter trainHamFreq = new WordCounter();
@@ -145,8 +150,8 @@ public class WordCounter{
 		fileOut("./data/train/ham", "hamCount.txt");
 		fileOut("./data/train/ham2", "ham2Count.txt");
 		fileOut("./data/train/spam", "spam2Count.txt");
-		trainHamFreq.set(hashout("./data/train/ham"));
-		trainSpamFreq = hashout("./data/train/spam");
+		trainHamFreq.setHamFreq();
+		trainSpamFreq.setSpamFreq();
 
 
 		
