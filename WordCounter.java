@@ -314,19 +314,29 @@ public class WordCounter extends Application{
 		VBox vBox = new VBox();
 		vBox.getChildren().addAll(table);
 		GridPane grid = new GridPane();
-		grid.setPadding(new Insets(0, 0, 0, 0));
-		grid.setVgap(8);
-		grid.setVgap(10);
+		grid.setPadding(new Insets(00, 10, 10, 10));
+		grid.setVgap(5);
+		grid.setHgap(100);
 
 		//Accuracy Label
 		Label accuracyLabel = new Label("Accuracy: ");
 		GridPane.setConstraints(accuracyLabel, 0, 4);
-
 		//Accuracy input
 		TextField accuracyInput = new TextField("3");
-		GridPane.setConstraints(accuracyInput, 1, 4);
+		accuracyInput.setPrefSize(100, 20);
+		accuracyInput.setMaxSize(100,20);
+		GridPane.setConstraints(accuracyInput, 0, 5);
 
-		grid.getChildren().addAll(accuracyLabel, accuracyInput);
+		//Accuracy Label
+		Label precisionLabel = new Label("Precision: ");
+		GridPane.setConstraints(precisionLabel, 0, 6);
+		//Accuracy input
+		TextField precisionInput = new TextField("3");
+		precisionInput.setPrefSize(100, 20);
+		precisionInput.setMaxSize(100,20);
+		GridPane.setConstraints(precisionInput, 0, 7);
+
+		grid.getChildren().addAll(accuracyLabel, accuracyInput, precisionLabel, precisionInput);
 		grid.setAlignment(Pos.BOTTOM_LEFT);
 		grid.add(vBox, 0,1);
 		Scene scene = new Scene(grid);
