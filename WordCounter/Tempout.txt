@@ -1,2 +1,0 @@
-Apple: 4
-Orange: 2
