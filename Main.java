@@ -2,10 +2,8 @@ import java.io.*;
 import java.text.DecimalFormat;
 import java.util.*;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -18,10 +16,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 public class Main extends Application{
-
 	private static Map<String, Double> wordCounts;
 	private Map<String, Double> trainHamFreq;
 	private Map<String, Double> trainSpamFreq;
@@ -58,7 +54,7 @@ public class Main extends Application{
 			for(File current: content){
 				parseFile(current);
 			}
-		}else{
+		}else{ // If there is only one file in the directory
 			existingWords.clear();
 			Scanner scanner = new Scanner(file);
 			// scanning token by token
@@ -91,8 +87,8 @@ public class Main extends Application{
 		String allLetters = "^[a-zA-Z]+$";
 		// returns true if the word is composed by only letters otherwise returns false;
 		return word.matches(allLetters);
-
 	}
+
 	// Create the output file with the words and their appearance in all files
 	public void outputWordCount(int minCount, File output) throws IOException{
 		System.out.println("Saving word counts to file:" + output.getAbsolutePath());
@@ -122,7 +118,7 @@ public class Main extends Application{
 		}
 
 	}
-    // calls parseFile and outputWordCount function
+    // calls parseFile and outputWordCount function (Used to make files for testing purposes)
 	public static void fileOut(String fileName1, String fileName2){
 		File dataDir = new File(fileName1);
 		File outFile = new File(fileName2);
@@ -180,17 +176,17 @@ public class Main extends Application{
 		}
 	}
 
-    // Calculate the probability that a file is a spam
+    // Calculate the probability that a file is a spam p(S|W)
 	public void findWordBoth(){
 		for(String i : trainSpamFreq.keySet()){
 			for(String n : trainHamFreq.keySet()){
-				if(i == n && wordInHam.get(i) != null) {
+				if(i == n && wordInHam.get(i) != null) { // Checks if the word is in both ham and spam
 					wordInBoth.put(i, wordInSpam.get(i)/(wordInSpam.get(i)+wordInHam.get(i)));
 				}
 			}
 		}
 	}
-    // Calculate the probability that a file is a spam
+    // Calculate the probability that a file is a spam P(S|F)
 	public double fileIsSpamProbability(File file)throws IOException{
 		double n = 0;
 		double threshold = 0.5; // threshold value to distinguish
@@ -221,7 +217,7 @@ public class Main extends Application{
 		return fileIsSpam;
 	}
 
-	// return a list of TestFile objects
+	// return a list of TestFile objects after finding the probabilities individually
 	public ObservableList<TestFile> getTestFiles(Main testWords, File dataDir) throws IOException {
 		ObservableList<TestFile> testFileList = FXCollections.observableArrayList();
 		double tempNum = 0.0;
@@ -230,11 +226,9 @@ public class Main extends Application{
 			//parse each file inside the directory
 			File[] content = dataDir.listFiles();
 			for (File current : content) {
-				testWords.fileIsSpamProbability(current);
-				tempNum = testWords.fileIsSpamProbability(current);
-				testFileList.add(new TestFile(current.getName(), tempNum, dataDir.getName()));
+				tempNum = testWords.fileIsSpamProbability(current); //Gets the probability
+				testFileList.add(new TestFile(current.getName(), tempNum, dataDir.getName())); //adds to testFile (FileName, Probability, Directory)
 			}
-
 		}
 		return testFileList;
 	}
@@ -245,7 +239,7 @@ public class Main extends Application{
 		Main trainHamFreq = new Main();
 		Main trainSpamFreq = new Main();
 		Main trainFinal = new Main();
-		Main test = new Main();
+		Main test;
 
 		// create output files for given absolute paths
 		fileOut("./data/train/ham", "hamCount.txt");
@@ -255,12 +249,11 @@ public class Main extends Application{
 		trainSpamFreq.setSpamFreq();
 		//Putting Probability of words in trainHamFreq P(W|H)
 		trainHamFreq.putTrainHamFreq();
-		//trainHamFreq.printTrainHamFreq();
 
 		//Putting Probability of words in trainSpamFreq P(W|S)
 		trainSpamFreq.putTrainSpamFreq();
 
-		//Set every value so far
+		//Set every value so far into combined object
 		trainFinal.trainSpamFreq = trainSpamFreq.trainSpamFreq;
 		trainFinal.trainHamFreq = trainSpamFreq.trainSpamFreq;
 		trainFinal.wordInHam = trainHamFreq.wordInHam;
@@ -276,21 +269,25 @@ public class Main extends Application{
 		directoryChooser.setInitialDirectory(new File("."));
 		File mainDirectory = directoryChooser.showDialog(primaryStage);
 		test = trainFinal;
-		primaryStage.setTitle("Assignment 1");
-
+		primaryStage.setTitle("Assignment 1 Spam Detection Solution");
+		//Creating table
 		TableView<TestFile> table;
-		//Name Columns
+
+		//Setting up File Column
 		TableColumn<TestFile, String> fileColumn = new TableColumn<>("File");
 		fileColumn.setMinWidth(200);
 		fileColumn.setCellValueFactory(new PropertyValueFactory<>("filename"));
 
+		//Setting up Actual Class Column
 		TableColumn<TestFile, String> actualClassColumn = new TableColumn<>("Actual Class");
 		actualClassColumn.setMinWidth(400);
 		actualClassColumn.setCellValueFactory(new PropertyValueFactory<>("actualClass"));
 
+		//Setting up Spam Probability Column
 		TableColumn<TestFile, String> spamProbabilityColumn = new TableColumn<>("Spam Probability");
 		spamProbabilityColumn.setMinWidth(400);
 		spamProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("spamProbability"));
+
 		//Table Setup
 		table = new TableView<>();
 		table.setItems(getTestFiles(test, mainDirectory));
@@ -300,8 +297,11 @@ public class Main extends Application{
 		test.accuracy = (test.numTruePositives + test.numTrueNegatives)/test.numTestFiles;
 		test.precision = test.numTruePositives/ (test.numFalsePositives + test.numTruePositives);
 
+		//Making vBox for Table
 		VBox vBox = new VBox();
 		vBox.getChildren().addAll(table);
+
+		//Making GridPane for Accuracy and Precision sections
 		GridPane grid = new GridPane();
 		grid.setPadding(new Insets(00, 10, 10, 10));
 		grid.setVgap(5);
@@ -310,6 +310,7 @@ public class Main extends Application{
 		//Accuracy Label
 		Label accuracyLabel = new Label("Accuracy: ");
 		GridPane.setConstraints(accuracyLabel, 0, 4);
+
 		//Accuracy input
 		DecimalFormat df = new DecimalFormat("0.00000");
 		TextField accuracyInput = new TextField(String.valueOf(df.format(test.accuracy)));
@@ -318,15 +319,17 @@ public class Main extends Application{
 		accuracyInput.setMaxSize(100,20);
 		GridPane.setConstraints(accuracyInput, 0, 5);
 
-		//Accuracy Label
+		//Precision Label
 		Label precisionLabel = new Label("Precision: ");
 		GridPane.setConstraints(precisionLabel, 0, 6);
-		//Accuracy input
+
+		//Precision input
 		TextField precisionInput = new TextField(String.valueOf(df.format(test.precision)));
 		precisionInput.setPrefSize(100, 20);
 		precisionInput.setMaxSize(100,20);
 		GridPane.setConstraints(precisionInput, 0, 7);
 
+		//Setting up scene
 		grid.getChildren().addAll(accuracyLabel, accuracyInput, precisionLabel, precisionInput);
 		grid.setAlignment(Pos.BOTTOM_LEFT);
 		grid.add(vBox, 0,1);

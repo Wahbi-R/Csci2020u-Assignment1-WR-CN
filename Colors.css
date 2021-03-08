@@ -1,11 +1,11 @@
-.root{
+.root{ /* Makes the background a nice colour */
   -fx-background-color: honeydew;
 }
 
-.label{
+.label{ /* Makes the accuracy and precision labels bold */
   -fx-font-weight: bold;
 }
-.text-field{
+.text-field{ /* Makes the accuracy and precision boxes a nice colour */
   -fx-background-color: powderblue;
   -fx-background-radius: 4;
 }
