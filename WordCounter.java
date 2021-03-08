@@ -7,11 +7,17 @@ public class WordCounter{
 	private static Map<String, Integer> wordCounts;
 	private Map<String, Integer> trainHamFreq;
 	private Map<String, Integer> trainSpamFreq;
+	private Map<String, Double> fileIsSpam;
+	private Map<String, Double> wordInSpam;
+	private Map<String, Double> wordInHam;
 	
 	public WordCounter(){
 		wordCounts = new TreeMap<>();
 		trainHamFreq = new TreeMap<>();
 		trainSpamFreq = new TreeMap<>();
+		fileIsSpam = new TreeMap<>();
+		wordInSpam = new TreeMap<>();
+		wordInHam = new TreeMap<>()
 	}
 	
 	public void parseFile(File file) throws IOException{
@@ -137,6 +143,11 @@ public class WordCounter{
 		trainSpamFreq = hashOut("./data/train/spam");
 	}
 
+//	public void printTrainHamFreq(){
+//		for(String i : trainHamFreq.keySet()){
+//			System.out.println("Key" + i + " " + trainHamFreq.get(i));
+//		}
+//	}
 	//main method
 	public static void main(String[] args) {
 		WordCounter trainHamFreq = new WordCounter();
@@ -151,6 +162,7 @@ public class WordCounter{
 		fileOut("./data/train/spam", "spam2Count.txt");
 		trainHamFreq.setHamFreq();
 		trainSpamFreq.setSpamFreq();
+		//trainHamFreq.printTrainHamFreq();
 //test
 
 		
