@@ -21,26 +21,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class Main extends Application{
-	public void initialize(){
-//		TableView<TestFile> table;
-//		//Name Columns
-//		TableColumn<TestFile, String> fileColumn = new TableColumn<>("File");
-//		fileColumn.setCellValueFactory(new PropertyValueFactory<>("filename"));
-//
-//		TableColumn<TestFile, String> actualClassColumn = new TableColumn<>("Actual Class");
-//		actualClassColumn.setCellValueFactory(new PropertyValueFactory<>("actualClass"));
-//
-//		TableColumn<TestFile, String> spamProbabilityColumn = new TableColumn<>("Spam Probability");
-//		spamProbabilityColumn.setCellValueFactory(new PropertyValueFactory<>("spamProbability"));
-//
-//		table = new TableView<>();
-//		table.setItems(getTestFiles());
-//		table.getColumns().addAll(fileColumn, actualClassColumn, spamProbabilityColumn);
-//		VBox vBox = new VBox();
-//		vBox.getChildren().addAll();
-	}
-
-
 
 	private static Map<String, Double> wordCounts;
 	private Map<String, Double> trainHamFreq;
@@ -50,14 +30,16 @@ public class Main extends Application{
 	private Map<String, Double> wordInHam;
 	private Map<String, Double> wordInBoth;
 
-	public double numTruePostives = 0;
+	public double numTruePositives = 0;
 	public double numFalsePositives = 0;
 	public double numTrueNegatives = 0;
 	public double accuracy ;
 	public double precision ;
 	public double numTestFiles;
 
+	// constructor function
 	public Main(){
+
 		wordCounts = new TreeMap<>();
 		trainHamFreq = new TreeMap<>();
 		trainSpamFreq = new TreeMap<>();
@@ -66,9 +48,9 @@ public class Main extends Application{
 		wordInHam = new TreeMap<>();
 		wordInBoth = new TreeMap<>();
 	}
-	
+	// parse through every file in the folder and count how many files does each different word shows up
 	public void parseFile(File file) throws IOException{
-		//System.out.println("Starting parsing the file:" + file.getAbsolutePcmdath());
+	    // initialize hash set to store every word only once every file
 		HashSet<String> existingWords = new HashSet<String>();
 		if(file.isDirectory()){
 			//parse each file inside the directory
@@ -90,8 +72,9 @@ public class Main extends Application{
 			for(String i: existingWords){
 				words.add(i);
 			}
-			
+
 			for(int i=0;i< words.size();i++){
+			    // if the word is valid and it already shows up in other files, increase the number of appearance by 1
 				if(isValidWord(words.get(i)) && wordCounts.containsKey(words.get(i))){
 					double previous = wordCounts.get(words.get(i));
 					wordCounts.put(words.get(i), previous+1.0);
@@ -99,47 +82,47 @@ public class Main extends Application{
 				else{
 					wordCounts.put(words.get(i),1.0);
 				}
-			}	
-		}		
-		
+			}
+		}
+
 	}
-	
+	// check if a word is a proper word
 	private boolean isValidWord(String word){
 		String allLetters = "^[a-zA-Z]+$";
 		// returns true if the word is composed by only letters otherwise returns false;
 		return word.matches(allLetters);
-			
+
 	}
-	
+	// Create the output file with the words and their appearance in all files
 	public void outputWordCount(int minCount, File output) throws IOException{
 		System.out.println("Saving word counts to file:" + output.getAbsolutePath());
 		System.out.println("Total words:" + wordCounts.keySet().size());
-		
+
 		if (!output.exists()){
 			output.createNewFile();
 			if (output.canWrite()){
 				PrintWriter fileOutput = new PrintWriter(output);
-				
+
 				Set<String> keys = wordCounts.keySet();
 				Iterator<String> keyIterator = keys.iterator();
-				
+
 				while(keyIterator.hasNext()){
 					String key = keyIterator.next();
 					double count = wordCounts.get(key);
-					// testing minimum number of occurances
-					if(count>=minCount){					
+					// testing minimum number of occurences
+					if(count>=minCount){
 						fileOutput.println(key + ": " + count);
 					}
 				}
-				
+
 				fileOutput.close();
 			}
 		}else{
 			System.out.println("Error: the output file already exists: " + output.getAbsolutePath());
 		}
-		
-	}
 
+	}
+    // calls parseFile and outputWordCount function
 	public static void fileOut(String fileName1, String fileName2){
 		File dataDir = new File(fileName1);
 		File outFile = new File(fileName2);
@@ -156,6 +139,7 @@ public class Main extends Application{
 		}
 	}
 
+	// calls the parseFile function and returns the map wordCounts
 	public static Map hashOut(String fileName1){
 		File dataDir = new File(fileName1);
 
@@ -173,27 +157,30 @@ public class Main extends Application{
 		return wordCounter.wordCounts;
 	}
 
+	// set the key value pair for trainHamFreq
 	public void setHamFreq(){
 		trainHamFreq = hashOut("./data/train/ham");
 	}
 
+    // set the key value pair for trainSpamFreq
 	public void setSpamFreq(){
 		trainSpamFreq = hashOut("./data/train/spam");
 	}
 
-
+    // Calculate the probability that a word is in ham files
 	public void putTrainHamFreq(){
 		for(String i : trainHamFreq.keySet()){
 			wordInHam.put(i, trainHamFreq.get(i)/trainHamFreq.keySet().size());
 		}
 	}
-
+    // Calculate the probability that a word is in spam files
 	public void putTrainSpamFreq(){
 		for(String i : trainSpamFreq.keySet()){
 			wordInSpam.put(i, trainSpamFreq.get(i)/trainSpamFreq.keySet().size());
 		}
 	}
 
+    // Calculate the probability that a file is a spam
 	public void findWordBoth(){
 		for(String i : trainSpamFreq.keySet()){
 			for(String n : trainHamFreq.keySet()){
@@ -203,10 +190,11 @@ public class Main extends Application{
 			}
 		}
 	}
-
+    // Calculate the probability that a file is a spam
 	public double fileIsSpamProbability(File file)throws IOException{
 		double n = 0;
-		double threshold = 0.5;
+		double threshold = 0.5; // threshold value to distinguish
+                                // between numTruePositives, numFalsePositives and numTrueNegatives
 			Scanner scanner = new Scanner(file);
 			while (scanner.hasNext()) {
 				String spamWord = scanner.next();
@@ -217,7 +205,7 @@ public class Main extends Application{
 			}
 		double fileIsSpam = 1/(1 + Math.pow(Math.E,n));
 		if (file.getParent().contains("spam") && fileIsSpam > threshold){
-			numTruePostives += 1;
+			numTruePositives += 1;
 		}
 		if (file.getParent().contains("ham") && fileIsSpam > threshold){
 			numFalsePositives += 1;
@@ -228,11 +216,12 @@ public class Main extends Application{
 		numTestFiles += 1;
 
 		DecimalFormat df = new DecimalFormat("0.00000");
-		df.format(fileIsSpam);
+		df.format(fileIsSpam); // the probability that a file is a spam
 
 		return fileIsSpam;
 	}
 
+	// return a list of TestFile objects
 	public ObservableList<TestFile> getTestFiles(Main testWords, File dataDir) throws IOException {
 		ObservableList<TestFile> testFileList = FXCollections.observableArrayList();
 		double tempNum = 0.0;
@@ -247,17 +236,18 @@ public class Main extends Application{
 			}
 
 		}
-//		testFileList.add(new TestFile(current.getName(), tempNum, content.getName()));
 		return testFileList;
 	}
 
 	@Override
 	public void start(Stage primaryStage) throws IOException {
+	    // Instantiate Main objects
 		Main trainHamFreq = new Main();
 		Main trainSpamFreq = new Main();
 		Main trainFinal = new Main();
 		Main test = new Main();
 
+		// create output files for given absolute paths
 		fileOut("./data/train/ham", "hamCount.txt");
 		fileOut("./data/train/ham2", "ham2Count.txt");
 		fileOut("./data/train/spam", "spam2Count.txt");
@@ -276,13 +266,9 @@ public class Main extends Application{
 		trainFinal.wordInHam = trainHamFreq.wordInHam;
 		trainFinal.wordInSpam = trainSpamFreq.wordInSpam;
 
-		//trainFinal.printTrainSpamFreq();
 
 		//Word is in both ham and spam and probability P(S|W)
 		trainFinal.findWordBoth();
-
-		//Get all of the TestFiles
-
 
 		//TEST PHASE
 		//Finding Probability that file is spam
@@ -291,7 +277,6 @@ public class Main extends Application{
 		File mainDirectory = directoryChooser.showDialog(primaryStage);
 		test = trainFinal;
 		primaryStage.setTitle("Assignment 1");
-
 
 		TableView<TestFile> table;
 		//Name Columns
@@ -312,8 +297,8 @@ public class Main extends Application{
 		table.getColumns().addAll(fileColumn, actualClassColumn, spamProbabilityColumn);
 
 		// calculate accuracy and precision
-		test.accuracy = (test.numTruePostives + test.numTrueNegatives)/test.numTestFiles;
-		test.precision = test.numTruePostives/ (test.numFalsePositives + test.numTruePostives);
+		test.accuracy = (test.numTruePositives + test.numTrueNegatives)/test.numTestFiles;
+		test.precision = test.numTruePositives/ (test.numFalsePositives + test.numTruePositives);
 
 		VBox vBox = new VBox();
 		vBox.getChildren().addAll(table);
@@ -354,17 +339,6 @@ public class Main extends Application{
 	//main method
 	public static void main(String[] args){
 		launch(args);
-		//fileIsSpamProbability("./data/test/ham");
-		// Test phase
-
-//		// Create the object for the test phase
-//		Main testHamFreq = new Main();
-//		Main testSpamFreq = new Main();
-//		Main testFinal = new Main();
-//
-//		fileOut("./data/test/ham", "hamCount.txt");
-//		fileOut("./data/test/spam", "spamCount.txt");
-		
 	}
 	
 }
