@@ -151,7 +151,7 @@ public class WordCounter{
 		fileOut("./data/train/spam", "spam2Count.txt");
 		trainHamFreq.setHamFreq();
 		trainSpamFreq.setSpamFreq();
-
+//test
 
 		
 	}
